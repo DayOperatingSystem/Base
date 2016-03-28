@@ -71,7 +71,7 @@ int main()
 		{
 		
 		default:
-			printf("[ INIT ] Unknown signal 0x%x!", msg.signal);
+			debug_printf("[ INIT ] Unknown signal 0x%x!", msg.signal);
 		}
 	}
 

@@ -90,7 +90,6 @@ int main(int argc, char* argv[])
 	char** args = NULL;
 
 	cout << "DayOS Shell v0.2" << endl;
-
 	while(running)
 	{
 		cout << "DayOS > ";

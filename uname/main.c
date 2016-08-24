@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <sys/utsname.h>
+#include <dayos/dayos.h>
 
 int main(int argc, char* argv[])
 {

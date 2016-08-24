@@ -35,7 +35,8 @@ void execute_config(const char* path)
 		else if(strcmp(p, ""))
 		{
 			LOG(p);
-			execute_program(p, 0, NULL);
+			if(!execute_program(p, 0, NULL))
+				LOG_STRING("Could not execute program", p);
 		}
 		
 		p = strtok(NULL, "\n");

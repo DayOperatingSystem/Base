@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
 
 				send_message(&msg, sender);
 			}
+			break;
 
 		    case VFS_SIGNAL_OPEN_DIR: {
 				pid_t sender = msg.sender;
@@ -148,10 +149,13 @@ int main(int argc, char* argv[])
 						file->type = VFS_DIRECTORY;
 						file->uid = dir->getUID();
 						file->guid = dir->getGUID();
+						
 						file->nid = dir->getNodeId();
+						file->child_nid = 0;
+						
 						file->device = vfs_pid;
 						file->offset = 0;
-						strcpy(file->path, request->path);	
+						strcpy(file->path, request->path);
 					}
 					break;
 
@@ -200,6 +204,8 @@ int main(int argc, char* argv[])
 					case NODE_DIR:
 					{
 						FSDir* dir = static_cast<FSDir*>(node);
+						
+						unsigned int next_item = request->param + 1;
 						node = dir->getChild(request->param);
 						
 						if(!node)
@@ -211,8 +217,10 @@ int main(int argc, char* argv[])
 						file->type = node->getType();
 						file->uid = node->getUID();
 						file->guid = node->getGUID();
+						
+						file->child_nid = next_item;
 						file->nid = node->getNodeId();
-
+						
 						strcpy(file->path, node->getName());
 					}
 					break;

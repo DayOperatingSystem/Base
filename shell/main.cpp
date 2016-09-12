@@ -92,13 +92,13 @@ int main(int argc, char* argv[])
 	cout << "DayOS Shell v0.2" << endl;
 	while(running)
 	{
-		cout << "DayOS > ";
+		cout << "DayOS:" << getenv("PWD") << " > ";
 		fgets(line, 256, stdin);
 		line[strlen(line) - 1] = 0;
 
 		if(!strcmp(line, "exit"))
 		{
-			delete line;
+			delete[] line;
 			return 0;
 		}
 		else if(!strcmp(line, "floppy"))

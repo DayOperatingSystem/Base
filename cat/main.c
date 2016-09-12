@@ -1,15 +1,12 @@
 #include <stdio.h>
 
-int main(int argc, char* argv[])
+void print_file(const char* path)
 {
-	if(argc <= 1)
-		return 0;
-
-	FILE* file = fopen(argv[1], "r");
+	FILE* file = fopen(path, "r");
 	if(!file)
 	{
 		perror("Could not open file");
-		return 1;
+		return;
 	}
 
 	while(!feof(file))
@@ -19,5 +16,15 @@ int main(int argc, char* argv[])
 
 	fflush(stdout);
 	fclose(file);
+}
+
+int main(int argc, char* argv[])
+{
+	if(argc <= 1)
+		return 0;
+
+	for(int i = 1; i < argc; i++)
+		print_file(argv[i]);
+	
 	return 0;
 }

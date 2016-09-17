@@ -65,9 +65,9 @@ void print_directory_dayos(const char* src)
 int main(int argc, char* argv[])
 {
 	if(argc <= 1)
-		print_directory_dayos(getenv("PWD"));
+		print_directory(getenv("PWD"));
 	else
-		print_directory_dayos(argv[1]);
+		print_directory(argv[1]);
 		
 	return 0;
 }

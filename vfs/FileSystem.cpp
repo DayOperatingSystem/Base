@@ -97,7 +97,7 @@ std::string FileSystem::getFilename(std::string& str, char delim)
 FSNode* FileSystem::findNode(const char* path)
 {
 	if(!path || strlen(path) == 0)
-		return false;
+		return nullptr;
 	
 	//printf("Searching for: %s\n", path);
 	if(!strcmp(path, "/")) return &root;

@@ -247,6 +247,50 @@ int main(int argc, char* argv[])
 			
 				send_message(&msg, sender);
 			}
+			break;
+			
+			case VFS_SIGNAL_CREATE_DIRECTORY: {
+				pid_t sender = msg.sender;
+				FSNode* node = rootfs.findNode(request->path);
+				struct vfs_file* file = (struct vfs_file*) &msg.message;
+
+				msg.signal = SIGNAL_FAIL;
+				if (!node)
+				{
+					std::string path = request->path;
+					int idx = path.find_last_of('/');
+					if(idx != -1)
+					{
+						path.erase(idx);			
+						rootfs.addNode((idx == 0) ? "/" : path.c_str(), new FSDir(&request->path[idx + 1], (VFS_OPEN_MODES) request->mode));
+						msg.signal = SIGNAL_OK;
+						send_message(&msg, msg.sender);
+					}
+				}		
+				else if(node->getType() == NODE_MOUNT)
+				{
+					FSMount* mount = static_cast<FSMount*>(node);
+					file->device = mount->getFilesystemDriver();
+					file->type = VFS_MOUNTPOINT;
+
+					// FIXME: Fetch from FS driver!
+					file->uid = mount->getUID();
+					file->guid = mount->getGUID();
+
+					std::string path;
+					path = request->path;
+					path = path.substr(strlen(mount->getPath()));
+						
+					if(path.empty())
+						path = "/";
+						
+					strcpy(file->path, path.c_str());
+					msg.signal = SIGNAL_OK;
+				}
+			
+				send_message(&msg, sender);
+			}
+			break;
 			
 			default:
 			{

@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 void print_directory(const char* src)
 {
@@ -15,12 +16,36 @@ void print_directory(const char* src)
 	}
 	
 	
+	struct stat statinfo;
+	char fullpath[512];
+	
 	do
 	{
 		errno = 0;
 		if((entry = readdir(dir)) != NULL)
 		{
-			printf("%s\n", entry->d_name);
+			snprintf(fullpath, sizeof(fullpath), "%s/%s", src, entry->d_name);
+			stat(fullpath, &statinfo);
+			
+			printf("%s\t", entry->d_name);
+			
+			switch(statinfo.st_mode)
+			{
+				case S_IFDIR:
+					printf("<DIR>\n");
+					break;
+					
+				case S_IFREG:
+					printf("<REG>\n");
+					break;
+					
+				case S_IFCHR:
+					printf("<DEV>\n");
+					break;
+					
+				default:
+					printf("<UNKNWN>\n");
+			}
 		}
 		else
 		{

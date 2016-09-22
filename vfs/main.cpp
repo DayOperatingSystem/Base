@@ -261,26 +261,24 @@ int main(int argc, char* argv[])
 					int idx = path.find_last_of('/');
 					if(idx != -1)
 					{
-						path.erase(idx);			
+						path.erase(idx);
 						rootfs.addNode((idx == 0) ? "/" : path.c_str(), new FSDir(&request->path[idx + 1], (VFS_OPEN_MODES) request->mode));
 						msg.signal = SIGNAL_OK;
-						send_message(&msg, msg.sender);
+					//	send_message(&msg, msg.sender);
 					}
-				}		
+				}
 				else if(node->getType() == NODE_MOUNT)
 				{
 					FSMount* mount = static_cast<FSMount*>(node);
 					file->device = mount->getFilesystemDriver();
 					file->type = VFS_MOUNTPOINT;
 
-					// FIXME: Fetch from FS driver!
 					file->uid = mount->getUID();
 					file->guid = mount->getGUID();
 
 					std::string path;
 					path = request->path;
 					path = path.substr(strlen(mount->getPath()));
-						
 					if(path.empty())
 						path = "/";
 						
@@ -289,6 +287,41 @@ int main(int argc, char* argv[])
 				}
 			
 				send_message(&msg, sender);
+			}
+			break;
+			
+			case VFS_SIGNAL_STAT: {
+				struct stat* st = (struct stat*) &msg.message;
+				pid_t sender = msg.sender;
+				FSNode* node = rootfs.findNode(request->path);
+
+				if (!node)
+				{
+					msg.signal = SIGNAL_FAIL;
+					send_message(&msg, msg.sender);
+					break;
+				}
+				
+				st->st_dev = msg.receiver;
+				st->st_mode = node->getType();
+
+				switch(node->getType())
+				{
+					case NODE_DEVICE:
+						st->st_mode = VFS_CHARACTER_DEVICE;
+						break;
+						
+					case NODE_DIR:
+						st->st_mode = VFS_DIRECTORY;
+						break;
+						
+					case NODE_MOUNT:
+						st->st_mode = VFS_MOUNTPOINT;
+						break;
+				}
+				
+				msg.signal = SIGNAL_OK;
+				send_message(&msg, msg.sender);
 			}
 			break;
 			
